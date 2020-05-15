@@ -1,27 +1,27 @@
 package tk.nathanf.logcat;
 
+import androidx.annotation.Nullable;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
-import java.util.concurrent.Semaphore;
 
+@SuppressWarnings("unused")
 public abstract class LogCatDelegate {
     private Date mRegisteredAt;
     private boolean mRunning;
-    private Semaphore mMutex;
     private Process mProcess;
     private Thread mThread;
 
-    /**
-     * Creates a new delegate that will receive any messages sent to LogCat.
-     */
-    public LogCatDelegate() {
-        mMutex = new Semaphore(1);
-    }
+    @Nullable
+    private Runnable deregisteredCallback;
 
     /**
      * Called when a new LogCat message is received.
+     *
+     * It is important that you do not log any messages within the context of this delegate. If you
+     * do you will end up stuck in a loop.
      *
      * @param message the message
      */
@@ -30,8 +30,8 @@ public abstract class LogCatDelegate {
     /**
      * Registers this delegate so that it will start receiving LogCat messages.
      */
-    public void register() {
-        if (mRunning)
+    public final void register() {
+        if (isRegistered())
             return;
 
         this.mRunning = true;
@@ -39,14 +39,13 @@ public abstract class LogCatDelegate {
             @Override
             public void run() {
                 try {
-                    mMutex.acquire();
-                    while (mRunning) {
+                    while (isRegistered()) {
                         mProcess = Runtime.getRuntime().exec("logcat -b all -v threadtime,epoch");
                         BufferedReader bufferedReader = new BufferedReader(
                                 new InputStreamReader(mProcess.getInputStream()));
                         String line;
                         while ((line = bufferedReader.readLine()) != null) {
-                            LogCatMessage message = LogCatMessage.parse(line);
+                            LogCatMessage message = LogCatMessage.from(line);
                             if (message != null && (
                                 message.getLoggedAt().after(mRegisteredAt) ||
                                 message.getLoggedAt().equals(mRegisteredAt)
@@ -56,9 +55,14 @@ public abstract class LogCatDelegate {
                         }
                         bufferedReader.close();
                     }
-                    mMutex.release();
                 }
-                catch (IOException | InterruptedException ignored) {}
+                catch (IOException ignored) {}
+                finally {
+                    if (deregisteredCallback != null) {
+                        deregisteredCallback.run();
+                        deregisteredCallback = null;
+                    }
+                }
             }
         });
 
@@ -70,22 +74,44 @@ public abstract class LogCatDelegate {
      * De-registers this delegate so that it will stop receiving LogCat messages. This method will
      * block the calling thread until the delegate has been fully de-registered.
      */
-    public void deregister() {
-        this.deregisterAsync();
+    public final void deregister() {
+        this.deregisterAsync(null);
         try {
-            mMutex.acquire();
-            mMutex.release();
-        } catch (InterruptedException ignored) {}
+            mThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * De-registers this delegate so that it will stop receiving LogCat messages. This method will
+     * not block the calling thread. When the delegate has been fully de-registered, the completed
+     * callback will be invoked.
+     *
+     * @param completed the callback to invoke once the delegate has been fully de-registered.
+     */
+    public final void deregisterAsync(@Nullable Runnable completed) {
+        if (!isRegistered())
+            return;
+        deregisteredCallback = completed;
+        mRunning = false;
+        mProcess.destroy();
     }
 
     /**
      * De-registers this delegate so that it will stop receiving LogCat messages. This method will
      * not block the calling thread.
      */
-    public void deregisterAsync() {
-        if (!mRunning)
-            return;
-        mRunning = false;
-        mProcess.destroy();
+    public final void deregisterAsync() {
+        this.deregisterAsync(null);
+    }
+
+    /**
+     * Determine if this delegate is registered.
+     *
+     * @return true if it's registered, false otherwise
+     */
+    public final boolean isRegistered() {
+        return mRunning;
     }
 }

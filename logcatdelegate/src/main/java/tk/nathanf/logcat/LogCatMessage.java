@@ -1,7 +1,5 @@
 package tk.nathanf.logcat;
 
-import android.util.Log;
-
 import androidx.annotation.Nullable;
 
 import java.text.DecimalFormat;
@@ -11,15 +9,21 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents a message received from LogCat.
+ */
 @SuppressWarnings("unused")
-public class LogCatMessage {
+public final class LogCatMessage {
     private Date loggedAt;
-    private int priority;
+    private LogCatPriority priority;
     private int pid;
     private int tid;
     private String tag;
     private String message;
 
+    /**
+     * Block access to instantiation.
+     */
     private LogCatMessage() {}
 
     /**
@@ -67,8 +71,8 @@ public class LogCatMessage {
      * Any <pre>%d</pre> format specifier will be replaced with the date using the format specified
      * in dateFormat.
      *
-     * See {@link #getFormatted(String)} for information on format specifiers.
-     * See {@link SimpleDateFormat} for information on DATE format specifiers.
+     * @see #getFormatted(String) for information on format specifiers.
+     * @see SimpleDateFormat for information on DATE format specifiers.
      *
      * @param format     The format for the message.
      * @param dateFormat The format for the date.
@@ -84,9 +88,9 @@ public class LogCatMessage {
         format = format.replace("%d", new SimpleDateFormat(
             dateFormat, Locale.US).format(this.loggedAt)
         );
-        format = format.replace("%vi", Integer.toString(priority));
-        format = format.replace("%vc", charForVerb(priority));
-        format = format.replace("%v", nameForVerb(priority));
+        format = format.replace("%vi", Integer.toString(priority.getNumeric()));
+        format = format.replace("%vc", priority.getCharacter());
+        format = format.replace("%v", priority.getName());
         format = format.replace("%p", Integer.toString(pid));
         format = format.replace("%r", Integer.toString(tid));
         format = format.replace("%t", tag);
@@ -105,19 +109,11 @@ public class LogCatMessage {
     }
 
     /**
-     * Retrieve the priority for the message. One of:
-     * <ul>
-     *     <li>{@link Log#ASSERT}</li>
-     *     <li>{@link Log#ERROR}</li>
-     *     <li>{@link Log#WARN}</li>
-     *     <li>{@link Log#INFO}</li>
-     *     <li>{@link Log#DEBUG}</li>
-     *     <li>{@link Log#VERBOSE}</li>
-     * </ul>
+     * Retrieve the priority for the message.
      *
      * @return the priority
      */
-    public final int getPriority() {
+    public final LogCatPriority getPriority() {
         return priority;
     }
 
@@ -157,105 +153,66 @@ public class LogCatMessage {
         return message;
     }
 
-    @SuppressWarnings("WeakerAccess")
+    /**
+     * Parses a message received from log cat into a {@link LogCatMessage} object.
+     *
+     * @param message the message as a string
+     * @return the {@link LogCatMessage}
+     */
+    @SuppressWarnings("ConstantConditions")
     @Nullable
-    static LogCatMessage parse(String message) {
-        final String regex = "(| +)([0-9]+)(\\.|)([0-9]{3}|)\\s+([0-9]+)\\s+([0-9]+)\\s([V|D|I|W|E|A])\\s([^:]*):\\s+(.*)";
+    static LogCatMessage from(String message) {
+        // Create the regex pattern
+        final String regex = "(| +)([0-9]+)(\\.|)([0-9]{3}|)\\s+([0-9]+)\\s+([0-9]+)\\s" +
+                             "([VDIWEA])\\s([^:]*):\\s+(.*)";
         final Pattern pattern = Pattern.compile(regex);
-        final Matcher matcher = pattern.matcher(message);
 
+        // Determine if the message matches the pattern
+        final Matcher matcher = pattern.matcher(message);
         if (! matcher.find()) {
             return null;
         }
 
+        // Extract the data required from the matcher.
         String timestampString = matcher.group(2);
         String subSecondString = matcher.group(4);
         String pidString       = matcher.group(5);
         String tidString       = matcher.group(6);
-        String verbString      = matcher.group(7);
+        String priorityString      = matcher.group(7);
         String tagString       = matcher.group(8);
         String messageString   = matcher.group(9);
 
+        // Parse the milliseconds value if one exists.
         long milliseconds = 0;
         if (subSecondString != null && subSecondString.trim().length() > 0) {
             milliseconds = (long) (Float.parseFloat("0." + subSecondString) * 1000F);
         }
 
-        int  verb      = -1;
-        if (verbString != null) {
-            verb = verbForString(verbString);
-        }
-
-        if (verb == -1) {
+        // Extract the priority from the message.
+        int  priority = LogCatPriority.getNumericFromCharacter(priorityString);
+        if (priority == -1) {
             return null;
         }
 
+        // Extract the timestamp from he message.
         long timestamp = (Long.parseLong(timestampString) * 1000L) + milliseconds;
+
+        // Extract the process ID and the thread ID from the message.
         int  pid       = Integer.parseInt(pidString);
         int  tid       = Integer.parseInt(tidString);
 
+        // Compile the output LogCatMessage object.
         LogCatMessage output = new LogCatMessage();
-
         output.loggedAt = new Date(timestamp);
         output.pid = pid;
         output.tid = tid;
-        output.priority = verb;
+        output.priority = new LogCatPriority(priority);
         output.tag = tagString;
         output.message = messageString;
 
         return output;
     }
 
-    private static int verbForString(String in) {
-        switch (in) {
-            case "V":
-                return Log.VERBOSE;
-            case "D":
-                return Log.DEBUG;
-            case "I":
-                return Log.INFO;
-            case "W":
-                return Log.WARN;
-            case "E":
-                return Log.ERROR;
-            case "A":
-                return Log.ASSERT;
-            default:
-                return -1;
-        }
-    }
 
-    private static String charForVerb(int verb) {
-        if (verb == Log.VERBOSE) {
-            return "V";
-        } else if (verb == Log.DEBUG) {
-            return "D";
-        } else if (verb == Log.INFO) {
-            return "I";
-        } else if (verb == Log.WARN) {
-            return "W";
-        } else if (verb == Log.ERROR) {
-            return "E";
-        } else if (verb == Log.ASSERT) {
-            return "A";
-        }
-        return "";
-    }
 
-    private static String nameForVerb(int verb) {
-        if (verb == Log.VERBOSE) {
-            return "VERBOSE";
-        } else if (verb == Log.DEBUG) {
-            return "DEBUG";
-        } else if (verb == Log.INFO) {
-            return "INFO";
-        } else if (verb == Log.WARN) {
-            return "WARN";
-        } else if (verb == Log.ERROR) {
-            return "ERROR";
-        } else if (verb == Log.ASSERT) {
-            return "ASSERT";
-        }
-        return "";
-    }
 }
