@@ -28,6 +28,18 @@ public abstract class LogCatDelegate {
     public abstract void onNewMessage(LogCatMessage message);
 
     /**
+     * Retrieve the command line arguments for the Log Cat child-process. The default value is
+     * <pre>-b all</pre>.
+     *
+     * The <pre>-v (--format)</pre> command line argument is not supported.
+     *
+     * @return the command line arguments for the Log Cat child-process.
+     */
+    public String getLogCatCommandLineArguments() {
+        return "-b all";
+    }
+
+    /**
      * Registers this delegate so that it will start receiving LogCat messages.
      */
     public final void register() {
@@ -40,7 +52,14 @@ public abstract class LogCatDelegate {
             public void run() {
                 try {
                     while (isRegistered()) {
-                        mProcess = Runtime.getRuntime().exec("logcat -b all -v threadtime,epoch");
+                        String cliArgs = getLogCatCommandLineArguments();
+                        if (cliArgs.contains("-v") || cliArgs.contains("--format")) {
+                            throw new RuntimeException(
+                                "LogCatDelegate does not support the -v (--format) " +
+                                "command line argument."
+                            );
+                        }
+                        mProcess = Runtime.getRuntime().exec("logcat " + cliArgs + " -v threadtime,epoch");
                         BufferedReader bufferedReader = new BufferedReader(
                                 new InputStreamReader(mProcess.getInputStream()));
                         String line;

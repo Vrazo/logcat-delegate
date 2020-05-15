@@ -212,7 +212,4 @@ public final class LogCatMessage {
 
         return output;
     }
-
-
-
 }
