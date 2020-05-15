@@ -50,9 +50,11 @@ Note that the `-v (--format)` argument is not supported as this is used internal
 
 You can format the `LogCatMessage` instances you receive back from the delegate fairly easily. 
 
-```
-message.getFormatted(String)
-```
+|Method|Description|
+|---|---|
+|`getFormatted()`|Retrieve a formatted version of the message.|
+|`getFormatted(String)`|Retrieve a formatted version of the message with a custom format.|
+|`getFormatted(String, String)`|Retrieve a formatted version of the message with a custom format and a custom timestamp format.|
 
 Calling `message.getFormatted(String)` with a format string will format the message as desired. You can use the format specifiers below to choose a format.
 
