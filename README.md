@@ -1,8 +1,34 @@
 # Log Cat Delegate
 
+[![](https://jitpack.io/v/nathan-fiscaletti/logcat-delegate.svg)](https://jitpack.io/#nathan-fiscaletti/logcat-delegate)
+[![](https://jitpack.io/v/nathan-fiscaletti/logcat-delegate/month.svg)](https://jitpack.io/#nathan-fiscaletti/logcat-delegate)
+[![GitHub license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/nathan-fiscaletti/logcat-delegate/blob/master/LICENSE)
+
 This utility allows you to attach a delegate to Log Cat and listen for incoming messages from within your applications Java code.
 
 It achieves this by starting a sub-process for Log Cat and parsing the output. This process will be kept alive if shut down for any reason, until either you kill your application or the delegate is de-registered.
+
+## Add the library to your application
+
+1. In your **project level** `build.gradle` add the repository
+
+    ```gradle
+    allprojects {
+        repositories {
+            ...
+            maven { url 'https://jitpack.io' }
+        }
+    }
+    ```
+    
+2. In your **module level** `build.gradle` add the library (find the version numbers [here](https://github.com/nathan-fiscaletti/logcat-delegate/releases))
+
+    ```gradle
+    dependencies {
+        ...
+        implementation 'com.github.nathan-fiscaletti:logcat-delegate:LATEST_VERSION'
+    }
+    ```
 
 ## Demo Application
 
