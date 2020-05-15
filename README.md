@@ -87,3 +87,5 @@ String formatted = message.getFormatted(
     "yyyy-MM-dd'T'HH:mm:ss.SSS"
 );
 ```
+
+If you prefer to handle formatting yourself or need a more complex solution you can retrieve the different elements of the message using it's getter methods.
