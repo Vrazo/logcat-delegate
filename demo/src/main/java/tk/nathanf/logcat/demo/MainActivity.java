@@ -20,6 +20,8 @@ import java.util.Random;
 import tk.nathanf.logcat.LogCatDelegate;
 import tk.nathanf.logcat.LogCatMessage;
 import tk.nathanf.logcat.LogCatMessageFilter;
+import tk.nathanf.logcat.LogCatPriority;
+import tk.nathanf.logcat.LogCatPriorityFilter;
 
 @SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     LogCatDelegate logCatDelegate;
     LogCatMessageFilter logCatMessageFilter;
+    LogCatPriorityFilter logCatPriorityFilter;
 
     /**
      * Initialize the view components and the delegate.
@@ -85,12 +88,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         // Test out the filter functionality.
+        // If you want  all log cat messages to display, comment this section out.
         //
-        // This filter will only display messages with the tag `LogCatDelegate-Demo`. If you want
-        // all log cat messages to display, comment this out.
+        // This filter will only display messages with the tag `LogCatDelegate-Demo`.
         logCatMessageFilter = new LogCatMessageFilter("LogCatDelegate\\-Demo");
         logCatMessageFilter.setMessageSpan(LogCatMessageFilter.MessageSpan.Tag);
         logCatDelegate.addMessageFilter(logCatMessageFilter);
+        //
+        // This filter will only display message with the INFO priority.
+        logCatPriorityFilter = new LogCatPriorityFilter(new ArrayList<LogCatPriority>() {{
+            add(new LogCatPriority(Log.INFO));
+        }});
+        logCatDelegate.addMessageFilter(logCatPriorityFilter);
     }
 
     /**

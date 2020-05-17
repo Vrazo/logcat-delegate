@@ -8,7 +8,7 @@ import java.util.regex.PatternSyntaxException;
  * Used to filter {@link LogCatMessage} instances in a {@link LogCatDelegate}.
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public final class LogCatMessageFilter {
+public class LogCatMessageFilter {
     /**
      * Used with {@link LogCatMessageFilter} to specify which part of the message to apply the
      * filter to when using {@link #isValid(LogCatMessage)}.
@@ -43,6 +43,8 @@ public final class LogCatMessageFilter {
      */
     private boolean reverse;
 
+    private boolean forcePriorityMessageSpan;
+
     /**
      * The pattern to compare messages to.
      */
@@ -60,18 +62,17 @@ public final class LogCatMessageFilter {
      * @throws PatternSyntaxException if the pattern is not valid regex
      */
     public LogCatMessageFilter(String regexPattern) throws PatternSyntaxException {
-        this.setPattern(regexPattern);
+        this.pattern = Pattern.compile(regexPattern);
         this.reverse = false;
     }
 
     /**
-     * Sets the regex pattern for the filter.
+     * Internal function for forcing the message priority in a sub-classed filter.
      *
-     * @param regexPattern the patter.
-     * @throws PatternSyntaxException if the pattern is not valid regex
+     * @param value true to force
      */
-    public void setPattern(String regexPattern) throws PatternSyntaxException {
-        this.pattern = Pattern.compile(regexPattern);
+    void setForcePriorityMessageSpan(boolean value) {
+        forcePriorityMessageSpan = value;
     }
 
     /**
@@ -104,7 +105,9 @@ public final class LogCatMessageFilter {
      */
     public boolean isValid(LogCatMessage message) {
         String input = message.getFormatted();
-        if (this.messageSpan == MessageSpan.Message) {
+        if (forcePriorityMessageSpan) {
+            input = message.getPriority().getCharacter();
+        } else if (this.messageSpan == MessageSpan.Message) {
             input = message.getMessage();
         } else if (this.messageSpan == MessageSpan.Tag) {
             input = message.getTag();

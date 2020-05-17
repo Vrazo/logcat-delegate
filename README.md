@@ -81,6 +81,15 @@ You can also choose to have a filter work in the opposite way. If you reverse th
 filter.setReverse(true);
 ```
 
+You can also apply a filter based on the message priority, however you don't do this with the Message Span. Instead, use the `LogCatMessagePriorityFilter` class. The constructor takes a list of priorities that should be considered valid.
+
+```java
+LogCatPriorityFilter filter = new LogCatPriorityFilter(new ArrayList<LogCatPriority>() {{
+    add(new LogCatPriority(Log.INFO));
+}});
+logCatDelegate.addMessageFilter(filter);
+```
+
 ## Formatting Messages
 
 You can format the `LogCatMessage` instances you receive back from the delegate fairly easily. 
