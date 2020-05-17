@@ -1,10 +1,12 @@
 package tk.nathanf.logcat;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Date;
 
 @SuppressWarnings("unused")
@@ -13,6 +15,12 @@ public abstract class LogCatDelegate {
     private boolean mRunning;
     private Process mProcess;
     private Thread mThread;
+    private ArrayList<LogCatMessageFilter> messageFilters = new ArrayList<>();
+
+    @NonNull
+    private String commandLineArguments = "-b all";
+
+
 
     @Nullable
     private Runnable deregisteredCallback;
@@ -25,18 +33,36 @@ public abstract class LogCatDelegate {
      *
      * @param message the message
      */
-    public abstract void onNewMessage(LogCatMessage message);
+    protected abstract void onNewMessage(LogCatMessage message);
 
     /**
-     * Retrieve the command line arguments for the Log Cat child-process. The default value is
+     * Sets the command line arguments for the Log Cat child-process. The default value is
      * <pre>-b all</pre>.
      *
      * The <pre>-v (--format)</pre> command line argument is not supported.
      *
-     * @return the command line arguments for the Log Cat child-process.
+     * @param commandLineArguments the command line arguments for the Log Cat child-process.
      */
-    public String getLogCatCommandLineArguments() {
-        return "-b all";
+    public void setCommandLineArguments(@NonNull String commandLineArguments) {
+        this.commandLineArguments = commandLineArguments;
+    }
+
+    /**
+     * Adds a message filter to the delegate.
+     *
+     * @param messageFilter the filter
+     */
+    public void addMessageFilter(LogCatMessageFilter messageFilter) {
+        this.messageFilters.add(messageFilter);
+    }
+
+    /**
+     * Removes a message filter from the delegate.
+     *
+     * @param messageFilter the filter
+     */
+    public void removeMessageFilter(LogCatMessageFilter messageFilter) {
+        this.messageFilters.remove(messageFilter);
     }
 
     /**
@@ -52,7 +78,7 @@ public abstract class LogCatDelegate {
             public void run() {
                 try {
                     while (isRegistered()) {
-                        String cliArgs = getLogCatCommandLineArguments();
+                        String cliArgs = commandLineArguments;
                         if (cliArgs.contains("-v") || cliArgs.contains("--format")) {
                             throw new RuntimeException(
                                 "LogCatDelegate does not support the -v (--format) " +
@@ -69,7 +95,16 @@ public abstract class LogCatDelegate {
                                 message.getLoggedAt().after(mRegisteredAt) ||
                                 message.getLoggedAt().equals(mRegisteredAt)
                             )) {
-                                onNewMessage(message);
+                                boolean messageAllowed = true;
+                                for (LogCatMessageFilter filter : messageFilters) {
+                                    messageAllowed = filter.isValid(message);
+                                    if (!messageAllowed)
+                                        break;
+                                }
+
+                                if (messageAllowed) {
+                                    onNewMessage(message);
+                                }
                             }
                         }
                         bufferedReader.close();

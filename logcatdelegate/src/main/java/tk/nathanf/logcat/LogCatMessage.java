@@ -20,6 +20,7 @@ public final class LogCatMessage {
     private int tid;
     private String tag;
     private String message;
+    private String raw;
 
     /**
      * Block access to instantiation.
@@ -154,6 +155,15 @@ public final class LogCatMessage {
     }
 
     /**
+     * Retrieve the raw message.
+     *
+     * @return the raw message
+     */
+    final String getRaw() {
+        return raw;
+    }
+
+    /**
      * Parses a message received from log cat into a {@link LogCatMessage} object.
      *
      * @param message the message as a string
@@ -178,7 +188,7 @@ public final class LogCatMessage {
         String subSecondString = matcher.group(4);
         String pidString       = matcher.group(5);
         String tidString       = matcher.group(6);
-        String priorityString      = matcher.group(7);
+        String priorityString  = matcher.group(7);
         String tagString       = matcher.group(8);
         String messageString   = matcher.group(9);
 
@@ -209,6 +219,7 @@ public final class LogCatMessage {
         output.priority = new LogCatPriority(priority);
         output.tag = tagString;
         output.message = messageString;
+        output.raw = message;
 
         return output;
     }

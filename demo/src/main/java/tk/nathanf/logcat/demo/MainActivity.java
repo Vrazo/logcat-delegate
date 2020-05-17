@@ -19,6 +19,7 @@ import java.util.Random;
 
 import tk.nathanf.logcat.LogCatDelegate;
 import tk.nathanf.logcat.LogCatMessage;
+import tk.nathanf.logcat.LogCatMessageFilter;
 
 @SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button controlButton;
 
     LogCatDelegate logCatDelegate;
+    LogCatMessageFilter logCatMessageFilter;
 
     /**
      * Initialize the view components and the delegate.
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
              * @param message the message
              */
             @Override
-            public void onNewMessage(final LogCatMessage message) {
+            protected void onNewMessage(final LogCatMessage message) {
                 runOnMainThread(new Runnable() {
                     @Override
                     public void run() {
@@ -81,6 +83,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
             }
         };
+
+        // Test out the filter functionality.
+        //
+        // This filter will only display messages with the tag `LogCatDelegate-Demo`. If you want
+        // all log cat messages to display, comment this out.
+        logCatMessageFilter = new LogCatMessageFilter("LogCatDelegate\\-Demo");
+        logCatMessageFilter.setMessageSpan(LogCatMessageFilter.MessageSpan.Tag);
+        logCatDelegate.addMessageFilter(logCatMessageFilter);
     }
 
     /**

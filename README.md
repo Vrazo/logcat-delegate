@@ -55,23 +55,31 @@ You can later de-register the delegate using the `logCatDelegate.deregister()` a
 
 ## Customizing the Log Cat invocation
 
-If you want to pass custom command line parameters to the `logcat` command when it is invoked, override the `getLogCatCommandLineArguments()` method of your `LogcatDelegate` implementation.
+If you want to pass custom command line parameters to the `logcat` command when it is invoked, you can set the command line arguments for the delegate.
 
 ```java
-LogCatDelegate logCatDelegate = new LogCatDelegate() {
-    @Override
-    public String getLogCatCommandLineArguments() {
-        return "-b all";
-    }
-
-    @Override
-    public void onNewMessage(LogCatMessage message) {
-        // process the message
-    }
-};
+logCatDelegate.setCommandLineArguments("-b all");
 ```
 
 Note that the `-v (--format)` argument is not supported as this is used internally for parsing messages. The default command line arguments that are sent are `-b all`.
+
+### Applying a filter
+
+You can filter out messages that are received in your delegate by applying a filter. Filters are based on regex and you can apply as many filters as you would like to a delegate. A message must pass validation for every filter in order for a delegate to consider it valid.
+
+You can determine which portion of the message the filter is compared against by setting the Message Span. By default, this will apply it to the full message. However you can choose between the full message, the tag or just the message body. See the relevant documentation for the MessageSpan enum for information on how these are applied.
+
+```java
+LogCatMessageFilter filter = new LogCatMessageFilter("LogCatDelegate\\-Demo");
+filter.setMessageSpan(LogCatMessageFilter.MessageSpan.Tag);
+logCatDelegate.addMessageFilter(filter);
+```
+
+You can also choose to have a filter work in the opposite way. If you reverse the filter using the `setReverse(boolean)` method on the LogCatMessageFilter, the filter will only consider a message to be valid if it does NOT match the configured regex.
+
+```java
+filter.setReverse(true);
+```
 
 ## Formatting Messages
 
