@@ -1,4 +1,4 @@
-package tk.nathanf.logcat.demo;
+package com.vrazo.logcat.demo;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,11 +17,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Random;
 
-import tk.nathanf.logcat.LogCatDelegate;
-import tk.nathanf.logcat.LogCatMessage;
-import tk.nathanf.logcat.LogCatMessageFilter;
-import tk.nathanf.logcat.LogCatPriority;
-import tk.nathanf.logcat.LogCatPriorityFilter;
+import com.vrazo.logcat.LogCatDelegate;
+import com.vrazo.logcat.LogCatMessage;
+import com.vrazo.logcat.LogCatMessageFilter;
+import com.vrazo.logcat.LogCatPriority;
+import com.vrazo.logcat.LogCatPriorityFilter;
 
 @SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {

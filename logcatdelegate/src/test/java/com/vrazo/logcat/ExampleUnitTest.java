@@ -1,4 +1,4 @@
-package tk.nathanf.logcat;
+package com.vrazo.logcat;
 
 import org.junit.Test;
 

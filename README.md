@@ -1,9 +1,9 @@
 # Log Cat Delegate
 
-[![](https://jitpack.io/v/nathan-fiscaletti/logcat-delegate.svg)](https://jitpack.io/#nathan-fiscaletti/logcat-delegate)
+[![](https://jitpack.io/v/Vrazo/logcat-delegate.svg)](https://jitpack.io/#Vrazo/logcat-delegate)
 ![Supported SDK](https://img.shields.io/badge/API-14%2b-blue)
-[![](https://jitpack.io/v/nathan-fiscaletti/logcat-delegate/month.svg)](https://jitpack.io/#nathan-fiscaletti/logcat-delegate)
-[![GitHub license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/nathan-fiscaletti/logcat-delegate/blob/master/LICENSE)
+[![](https://jitpack.io/v/Vrazo/logcat-delegate/month.svg)](https://jitpack.io/#Vrazo/logcat-delegate)
+[![GitHub license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/Vrazo/logcat-delegate/blob/master/LICENSE)
 
 This utility allows you to attach a delegate to Log Cat and listen for incoming messages from within your applications Java code.
 
@@ -22,12 +22,12 @@ It achieves this by starting a sub-process for Log Cat and parsing the output. T
     }
     ```
     
-2. In your **module level** `build.gradle` add the library (find the version numbers [here](https://github.com/nathan-fiscaletti/logcat-delegate/releases))
+2. In your **module level** `build.gradle` add the library (find the version numbers [here](https://github.com/Vrazo/logcat-delegate/releases))
 
     ```gradle
     dependencies {
         ...
-        implementation 'com.github.nathan-fiscaletti:logcat-delegate:LATEST_VERSION'
+        implementation 'com.github.Vrazo:logcat-delegate:LATEST_VERSION'
     }
     ```
 

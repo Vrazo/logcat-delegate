@@ -1,14 +1,26 @@
-package tk.nathanf.logcat;
+package com.vrazo.logcat;
 
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A filter that will work based on message priority.
+ */
 public class LogCatPriorityFilter extends LogCatMessageFilter {
+    /**
+     * Create the priority filter with the specified priorities.
+     *
+     * @param priorities the priorities
+     */
     public LogCatPriorityFilter(List<LogCatPriority> priorities) {
         super(prioritiesToValidRegex(priorities));
         super.setForcePriorityMessageSpan(true);
     }
 
+    /**
+     * Message span is not supported for {@link LogCatPriorityFilter}.
+     *
+     * @param messageSpan the message span
+     */
     @Override
     public void setMessageSpan(MessageSpan messageSpan) {
         throw new RuntimeException("Message Span is not supported on LogCatPriorityFilter");

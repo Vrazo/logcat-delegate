@@ -1,4 +1,4 @@
-package tk.nathanf.logcat;
+package com.vrazo.logcat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

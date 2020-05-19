@@ -1,4 +1,4 @@
-package tk.nathanf.logcat;
+package com.vrazo.logcat;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("tk.nathanf.logcatdelegate.test", appContext.getPackageName());
+        assertEquals("com.vrazo.logcat", appContext.getPackageName());
     }
 }

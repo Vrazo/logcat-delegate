@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
     defaultConfig {
-        applicationId "tk.nathanf.logcat"
+        applicationId "com.vrazo.logcat"
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
