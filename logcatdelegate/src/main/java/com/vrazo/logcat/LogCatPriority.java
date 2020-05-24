@@ -37,7 +37,7 @@ public class LogCatPriority {
     /**
      * Create a new LogCatPriority from it's character value.
      *
-     * Valid values include V, D, I, W, E, and A.
+     * Valid values include V, D, I, W, E, and F.
      *
      * @param character the chracter
      */
@@ -45,7 +45,7 @@ public class LogCatPriority {
         this.priority = getNumericFromCharacter(character);
         if (this.priority == -1) {
             throw new RuntimeException(
-                "Invalid character value for priority. Valid values include V, D, I, W, E, and A"
+                "Invalid character value for priority. Valid values include V, D, I, W, E, and F"
             );
         }
     }
@@ -80,7 +80,7 @@ public class LogCatPriority {
     /**
      * Retrieve the numeric value for a priority specified in the input.
      *
-     * Input should be one of "V, D, I, W, E, or A".
+     * Input should be one of "V, D, I, W, E, or F".
      *
      * Output will be One of:
      * <ul>
@@ -107,7 +107,7 @@ public class LogCatPriority {
                 return Log.WARN;
             case "E":
                 return Log.ERROR;
-            case "A":
+            case "F":
                 return Log.ASSERT;
             default:
                 return -1;
@@ -127,7 +127,7 @@ public class LogCatPriority {
      *     <li>{@link Log#VERBOSE}</li>
      * </ul>
      *
-     * Output will be the corresponding character, one of "V, D, I, W, E, or A".
+     * Output will be the corresponding character, one of "V, D, I, W, E, or F".
      *
      * @param priority the input priority
      *
@@ -145,7 +145,7 @@ public class LogCatPriority {
         } else if (priority == Log.ERROR) {
             return "E";
         } else if (priority == Log.ASSERT) {
-            return "A";
+            return "F";
         }
         return "";
     }

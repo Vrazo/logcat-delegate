@@ -174,7 +174,7 @@ public final class LogCatMessage {
     static LogCatMessage from(String message) {
         // Create the regex pattern
         final String regex = "(| +)([0-9]+)(\\.|)([0-9]{3}|)\\s+([0-9]+)\\s+([0-9]+)\\s" +
-                             "([VDIWEA])\\s([^:]*):\\s+(.*)";
+                             "([VDIWEF])\\s([^:]*):\\s+(.*)";
         final Pattern pattern = Pattern.compile(regex);
 
         // Determine if the message matches the pattern
