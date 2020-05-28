@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
              * @param message the message
              */
             @Override
-            protected void onNewMessage(final LogCatMessage message) {
+            protected final void onNewMessage(final LogCatMessage message) {
                 runOnMainThread(new Runnable() {
                     @Override
                     public void run() {
@@ -84,6 +84,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 });
+            }
+
+            /**
+             * Called if there is an error during operation.
+             *
+             * @param error the error
+             */
+            @Override
+            protected final void onException(Exception error) {
+                if (error instanceof InitializationException) {
+                    Log.e("LogCatDelegate-Demo", "InitializationException: " + error.getMessage(), error);
+                    logView.append("InitializationException: " + error.getMessage());
+                }
+                Log.e("LogCatDelegate-Demo", "Error: " + error.getMessage(), error);
+                logView.append("ERROR: " + error.getMessage());
             }
         };
 
