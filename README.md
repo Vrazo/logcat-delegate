@@ -63,7 +63,20 @@ logCatDelegate.setCommandLineArguments("-b all");
 
 Note that the `-v (--format)` argument is not supported as this is used internally for parsing messages. The default command line arguments that are sent are `-b all`.
 
-### Applying a filter
+## Error Handling
+
+You can override the `onException` method of your LogCatDelegate implementation in order to catch exceptions that may be thrown during the operation of the logcat sub-process.
+
+```java
+@Override
+public void onException(Exception error) {
+    // handle the error
+}
+```
+
+> If the exception passed to the `onException` method is of the type `InitializationException`, it means that your delegate was unable to initialize.
+
+## Applying a filter
 
 You can filter out messages that are received in your delegate by applying a filter. Filters are based on regex and you can apply as many filters as you would like to a delegate. A message must pass validation for every filter in order for a delegate to consider it valid.
 
