@@ -111,10 +111,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         logCatDelegate.addMessageFilter(logCatMessageFilter);
         //
         // This filter will only display message with the INFO priority.
-        logCatPriorityFilter = new LogCatPriorityFilter(new ArrayList<LogCatPriority>() {{
-            add(new LogCatPriority(Log.INFO));
-        }});
-        logCatDelegate.addMessageFilter(logCatPriorityFilter);
+        // logCatPriorityFilter = new LogCatPriorityFilter(new ArrayList<LogCatPriority>() {{
+        //    add(new LogCatPriority(Log.INFO));
+        // }});
+        // logCatDelegate.addMessageFilter(logCatPriorityFilter);
     }
 
     /**

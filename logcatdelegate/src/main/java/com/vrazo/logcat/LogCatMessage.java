@@ -2,8 +2,11 @@ package com.vrazo.logcat;
 
 import androidx.annotation.Nullable;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -36,6 +39,7 @@ public final class LogCatMessage {
      *
      * @return The formatted message.
      */
+    @SuppressWarnings("WeakerAccess")
     public final String getFormatted() {
         return getFormatted("%de %p %r %vc %t: %m");
     }
@@ -114,6 +118,7 @@ public final class LogCatMessage {
      *
      * @return the priority
      */
+    @SuppressWarnings("WeakerAccess")
     public final LogCatPriority getPriority() {
         return priority;
     }
@@ -141,6 +146,7 @@ public final class LogCatMessage {
      *
      * @return the tag
      */
+    @SuppressWarnings("WeakerAccess")
     public final String getTag() {
         return tag;
     }
@@ -150,6 +156,7 @@ public final class LogCatMessage {
      *
      * @return the message
      */
+    @SuppressWarnings("WeakerAccess")
     public final String getMessage() {
         return message;
     }
@@ -173,8 +180,7 @@ public final class LogCatMessage {
     @Nullable
     static LogCatMessage from(String message) {
         // Create the regex pattern
-        final String regex = "(| +)([0-9]+)(\\.|)([0-9]{3}|)\\s+([0-9]+)\\s+([0-9]+)\\s" +
-                             "([VDIWEF])\\s([^:]*):\\s+(.*)";
+        final String regex = "(| +)([0-9]{2}-[0-9]{2}\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3})\\s+([0-9]+)\\s+([0-9]+)\\s([VDIWEF])\\s([^:]*):\\s+(.*)";
         final Pattern pattern = Pattern.compile(regex);
 
         // Determine if the message matches the pattern
@@ -185,17 +191,21 @@ public final class LogCatMessage {
 
         // Extract the data required from the matcher.
         String timestampString = matcher.group(2);
-        String subSecondString = matcher.group(4);
-        String pidString       = matcher.group(5);
-        String tidString       = matcher.group(6);
-        String priorityString  = matcher.group(7);
-        String tagString       = matcher.group(8);
-        String messageString   = matcher.group(9);
+        String pidString       = matcher.group(3);
+        String tidString       = matcher.group(4);
+        String priorityString  = matcher.group(5);
+        String tagString       = matcher.group(6);
+        String messageString   = matcher.group(7);
 
-        // Parse the milliseconds value if one exists.
-        long milliseconds = 0;
-        if (subSecondString != null && subSecondString.trim().length() > 0) {
-            milliseconds = (long) (Float.parseFloat("0." + subSecondString) * 1000F);
+        // Extract the timestamp from he message.
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.ENGLISH);
+        Date date;
+        try {
+            date = dateFormat.parse(
+                Calendar.getInstance().get(Calendar.YEAR) + "-" + timestampString
+            );
+        } catch (ParseException e) {
+            return null;
         }
 
         // Extract the priority from the message.
@@ -204,16 +214,13 @@ public final class LogCatMessage {
             return null;
         }
 
-        // Extract the timestamp from he message.
-        long timestamp = (Long.parseLong(timestampString) * 1000L) + milliseconds;
-
         // Extract the process ID and the thread ID from the message.
         int  pid       = Integer.parseInt(pidString);
         int  tid       = Integer.parseInt(tidString);
 
         // Compile the output LogCatMessage object.
         LogCatMessage output = new LogCatMessage();
-        output.loggedAt = new Date(timestamp);
+        output.loggedAt = date;
         output.pid = pid;
         output.tid = tid;
         output.priority = new LogCatPriority(priority);

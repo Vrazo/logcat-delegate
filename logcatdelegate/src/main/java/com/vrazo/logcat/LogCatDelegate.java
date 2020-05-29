@@ -14,6 +14,7 @@ public abstract class LogCatDelegate {
     /**
      * Type definition for initialization exceptions.
      */
+    @SuppressWarnings("WeakerAccess")
     public final static class InitializationException extends Exception {
         InitializationException(String error) {
             super(error);
@@ -101,7 +102,7 @@ public abstract class LogCatDelegate {
                                 "command line argument."
                             );
                         }
-                        mProcess = Runtime.getRuntime().exec("logcat " + cliArgs + " -v threadtime,epoch");
+                        mProcess = Runtime.getRuntime().exec("logcat " + cliArgs + " -v threadtime");
                         int exitCode = 0;
                         try {
                             exitCode = mProcess.exitValue();
